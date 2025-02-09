@@ -63,7 +63,7 @@ func (c *CmdAnimateRepos) Run(
 				DependencyGraphManifests struct {
 					Nodes []struct {
 						Filename    string
-						Depenencies struct {
+						Dependencies struct {
 							Nodes []struct {
 								Repository struct {
 									Owner struct {
@@ -119,8 +119,8 @@ func (c *CmdAnimateRepos) Run(
 
 		var manifetsCursor, depCursor *string
 		for _, m := range q.Repository.DependencyGraphManifests.Nodes {
-			log.FromContext(ctx).Debugf("processing manifest %s(%d)", m.Filename, len(m.Depenencies.Nodes))
-			for _, d := range m.Depenencies.Nodes {
+			log.FromContext(ctx).Debugf("processing manifest %s(%d)", m.Filename, len(m.Dependencies.Nodes))
+			for _, d := range m.Dependencies.Nodes {
 				o := d.Repository.Owner
 				if o.Sponsorable.HasSponsorsListing {
 					_ = db.InsertDonation(ctx, database.InsertDonationParams{
@@ -131,8 +131,8 @@ func (c *CmdAnimateRepos) Run(
 					log.FromContext(ctx).Debugf("fundable %s", o.RepositoryOwner.Login)
 				}
 			}
-			if m.Depenencies.PageInfo.HasNextPage {
-				depCursor = &m.Depenencies.PageInfo.EndCursor
+			if m.Dependencies.PageInfo.HasNextPage {
+				depCursor = &m.Dependencies.PageInfo.EndCursor
 			}
 		}
 
